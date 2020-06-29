@@ -1,0 +1,52 @@
+{
+  "handler": {
+    "type": "DispatchHandler",
+    "config": {
+      "bindings": [
+        {
+          "condition": "${empty session.username}",
+          "handler": {
+            "type": "StaticResponseHandler",
+            "config": {
+              "status": 302,
+              "reason": "Found",
+              "headers": {
+                "Location": [
+                  "http://sp.example.com:8080/saml/SPInitiatedSSO"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "handler": {
+            "type": "Chain",
+            "config": {
+              "filters": [
+                {
+                  "type": "StaticRequestFilter",
+                  "config": {
+                    "method": "POST",
+                    "uri": "http://app.example.com:8081/login",
+                    "form": {
+                      "username": [
+                        "${session.username[0]}"
+                      ],
+                      "password": [
+                        "${session.password[0]}"
+                      ]
+                    }
+                  }
+                }
+              ],
+              "handler": "ReverseProxyHandler"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "condition": "${matches(request.uri.path, '^/federate')}",
+  "session": "JwtSession"
+}
+

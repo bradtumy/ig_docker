@@ -1,0 +1,15 @@
+{
+  "handler": {
+    "type": "SamlFederationHandler",
+    "config": {
+      "assertionMapping": {
+        "username": "cn",
+        "password": "sn"
+      },
+      "subjectMapping": "sp-subject-name",
+      "redirectURI": "/federate"
+    }
+  },
+  "condition": "${matches(request.uri.path, '^/saml')}",
+  "session": "JwtSession"
+}
